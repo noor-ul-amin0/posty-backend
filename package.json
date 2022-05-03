@@ -1,7 +1,7 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "This is just a simple nodejs scrapper which does scrap the title of a website.",
+  "description": "This is just a simple nodejs which use Sequelize to interact with MySQL database",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,8 +10,13 @@
   "author": "Noor Ul Amin",
   "license": "ISC",
   "dependencies": {
-    "ejs": "^3.1.6",
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
-    "validator": "^13.6.0"
+    "mysql2": "^2.3.3",
+    "rootpath": "^0.1.2",
+    "sequelize": "^6.19.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^6.2.0"
   }
 }

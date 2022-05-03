@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
+const bcrypt = require("bcryptjs");
 const sequelize = require("../db");
-const { isEmail } = require("validator");
 const User = sequelize.define(
   "user",
   {
@@ -9,21 +9,11 @@ const User = sequelize.define(
       allowNull: false,
       validate: {
         len: {
-          args: [4, 50],
-          msg: "firstName must be at least 5 characters long and less than 50.",
+          args: [3, 50],
+          msg: "First Name must be at least 5 characters long and less than 50.",
         },
-        // min: {
-        //   args: [5],
-        //   msg: "firstName must be at least 5 characters long.",
-        // },
-        // max: {
-        //   args: [50],
-        //   msg: "firstName must not be greater than 50 characters",
-        // },
       },
       set(value) {
-        // Storing passwords in plaintext in the database is terrible.
-        // Hashing the value with an appropriate cryptographic hash function is better.
         this.setDataValue("firstName", value.toLowerCase().trim());
       },
     },
@@ -31,19 +21,12 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        // min: {
-        //   args: [5],
-        //   msg: "lastName must be at least 5 characters long.",
-        // },
-        // max: {
-        //   args: [50],
-        //   msg: "lastName must not be greater than 50 characters",
-        // },
+        len: {
+          args: [3, 50],
+          msg: "Last Name must be at least 5 characters long and less than 50.",
+        },
       },
-
       set(value) {
-        // Storing passwords in plaintext in the database is terrible.
-        // Hashing the value with an appropriate cryptographic hash function is better.
         this.setDataValue("lastName", value.toLowerCase().trim());
       },
     },
@@ -51,6 +34,19 @@ const User = sequelize.define(
       type: DataTypes.VIRTUAL,
       get() {
         return `${this.firstName} ${this.lastName}`;
+      },
+    },
+    avatar: {
+      type: DataTypes.STRING,
+    },
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        min: {
+          args: [18],
+          msg: "Age must be greater than or equal to 18",
+        },
       },
     },
     email: {
@@ -71,20 +67,19 @@ const User = sequelize.define(
           args: [5, 50],
           msg: "password must be at least 5 characters long and less than 50.",
         },
-        // min: {
-        //   args: [5],
-        //   msg: "password must be at least 5 characters long.",
-        // },
-        // max: {
-        //   args: [50],
-        //   msg: "password must not be greater than 50 characters",
-        // },
       },
+      // async set(value) {
+      //   // Storing passwords in plaintext in the database is terrible.
+      //   // Hashing the value with an appropriate cryptographic hash function is better.
+      //   const hash = await bcrypt.hash(value, 12);
+      //   this.setDataValue("password", hash);
+      // },
     },
   },
   {
     timestamps: true,
+    paranoid: true,
+    onDelete: "RESTRICT",
   }
 );
-
 module.exports = User;

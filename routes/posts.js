@@ -1,7 +1,8 @@
 const router = require("express").Router();
+const Sequelize = require("sequelize");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const { Post, User } = require("../models");
+const { Post, User, Tag } = require("../models");
 router
   .route("/")
   .post(
@@ -12,15 +13,53 @@ router
   )
   .get(
     catchAsync(async (req, res, next) => {
+      // the only problem with this query is that it returns only 1 associated tag instead of all
       const posts = await Post.findAll({
-        include: {
-          attributes: { exclude: ["password", "createdAt", "updatedAt"] },
-          model: User,
-          as: "author",
+        // where clauses at the top-level
+        // where: {
+        //   "$Tags.name$": { [Op.eq]: "Action" },
+        // },
+        include: [
+          {
+            attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+            model: User,
+            as: "author",
+          },
+          {
+            model: Tag,
+            through: { attributes: [] },
+          },
+        ],
+        group: ["Post.id"],
+        // includeIgnoreAttributes: false,
+        attributes: {
+          include: [
+            [Sequelize.fn("COUNT", Sequelize.col("tags.id")), "totalTags"],
+          ],
         },
+        // order: [[Sequelize.fn("COUNT", Sequelize.col("tags.id")), "DESC"]],
+        // include: [
+        //   {
+        //     attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+        //     model: User,
+        //     as: "author",
+        //   },
+        //   {
+        //     model: Tag,
+        //     through: { attributes: [] },
+        //   },
+        // ],
+        // Fetch all models associated with User and their nested associations (recursively)
+        // include: { all: true, nested: true },
       });
-      posts.forEach(async (post) => console.log(await post.getAuthor()));
-      res.send({ success: true, data: posts });
+      // const data = [];
+      // for (const post of posts) {
+      //   data.push({
+      //     totalTags: await post.countTags(),
+      //     ...post.toJSON(),
+      //   });
+      // }
+      res.send({ success: true, result: posts.length, data: posts });
     })
   );
 router
@@ -44,12 +83,7 @@ router
       const post = await Post.findByPk(req.params.postId);
       //2. check if post exists
       if (post) {
-        //3. loop through those properties which user want to update.
-        Object.keys(req.body.post).forEach((key) => {
-          //4. don't let user to change foreign key (userId)
-          if (key !== "userId") post[key] = req.body.post[key];
-        });
-        await post.save();
+        await post.update(req.body, { fields: ["title", "body"] });
         return res.send({ success: true, data: post });
       }
       //5. if post doesn't exists
