@@ -22,7 +22,7 @@ function GenerateFakeData(noOfRecords = 10, forEachRecord = 3) {
     for (let j = counter; j <= counter + forEachRecord; j++) {
       const title = faker.random.words(3);
       const body = faker.lorem.paragraph();
-      posts.push({ id: j, title, body, userId: i });
+      posts.push({ id: j, title, body, userId: i, image: faker.image.image() });
       temp = j;
     }
     counter = temp + 1;

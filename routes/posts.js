@@ -19,25 +19,6 @@ router
         // where: {
         //   "$Tags.name$": { [Op.eq]: "Action" },
         // },
-        include: [
-          {
-            attributes: { exclude: ["password", "createdAt", "updatedAt"] },
-            model: User,
-            as: "author",
-          },
-          {
-            model: Tag,
-            through: { attributes: [] },
-          },
-        ],
-        group: ["Post.id"],
-        // includeIgnoreAttributes: false,
-        attributes: {
-          include: [
-            [Sequelize.fn("COUNT", Sequelize.col("tags.id")), "totalTags"],
-          ],
-        },
-        // order: [[Sequelize.fn("COUNT", Sequelize.col("tags.id")), "DESC"]],
         // include: [
         //   {
         //     attributes: { exclude: ["password", "createdAt", "updatedAt"] },
@@ -49,16 +30,28 @@ router
         //     through: { attributes: [] },
         //   },
         // ],
+        // group: ["Post.id"],
+        // // includeIgnoreAttributes: false,
+        // attributes: {
+        //   include: [
+        //     [Sequelize.fn("COUNT", Sequelize.col("tags.id")), "totalTags"],
+        //   ],
+        // },
+        // order: [[Sequelize.fn("COUNT", Sequelize.col("tags.id")), "DESC"]],
+        include: [
+          {
+            attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+            model: User,
+            as: "author",
+          },
+          {
+            model: Tag,
+            through: { attributes: [] },
+          },
+        ],
         // Fetch all models associated with User and their nested associations (recursively)
         // include: { all: true, nested: true },
       });
-      // const data = [];
-      // for (const post of posts) {
-      //   data.push({
-      //     totalTags: await post.countTags(),
-      //     ...post.toJSON(),
-      //   });
-      // }
       res.send({ success: true, result: posts.length, data: posts });
     })
   );

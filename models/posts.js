@@ -5,6 +5,12 @@ const Post = sequelize.define(
   {
     title: { type: DataTypes.STRING, allowNull: false },
     body: { type: DataTypes.TEXT, allowNull: false },
+    image: {
+      type: DataTypes.STRING,
+      validate: {
+        isUrl: { msg: "Please provide a valid image url" },
+      },
+    },
   },
   {
     timestamps: true,

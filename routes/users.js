@@ -32,16 +32,17 @@ router
   .get(
     catchAsync(async (req, res, next) => {
       const user = await User.findByPk(req.params.userId, {
-        attributes: {
-          include: [
-            [
-              Sequelize.fn("COUNT", Sequelize.col("posts.userId")),
-              "totalPosts",
-            ],
-          ],
-          exclude: ["password"],
-        },
-        group: ["posts.userId"],
+        include: Post,
+        // attributes: {
+        //   include: [
+        //     [
+        //       Sequelize.fn("COUNT", Sequelize.col("posts.userId")),
+        //       "totalPosts",
+        //     ],
+        //   ],
+        //   exclude: ["password"],
+        // },
+        // group: ["posts.userId"],
       });
       return res.send({ success: true, data: user });
     })
